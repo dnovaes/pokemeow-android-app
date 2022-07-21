@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.dnovaes.pokemontcg.singleCard.views.FirstFragment"
+        android:name="com.dnovaes.pokemontcg.FirstFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.dnovaes.pokemontcg.SecondFragment"
+        android:name="com.dnovaes.pokemontcg.singleCard.views.SingleCardFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 

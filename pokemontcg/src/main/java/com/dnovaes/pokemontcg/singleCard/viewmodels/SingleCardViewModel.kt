@@ -6,13 +6,13 @@ import com.dnovaes.pokemontcg.singleCard.repository.PokemonTcgRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SingleCardViewModel: ViewModel() {
+class SingleCardViewModel(
+    private val pkmTcgRepository: PokemonTcgRepository
+): ViewModel() {
 
-    private val pkmTcgRepository: PokemonTcgRepository = PokemonTcgRepository()
-
-    fun getCard() {
+    fun getCard(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = pkmTcgRepository.getCard()
+            val result = pkmTcgRepository.requestCard(id)
             println("logd result: $result")
         }
     }

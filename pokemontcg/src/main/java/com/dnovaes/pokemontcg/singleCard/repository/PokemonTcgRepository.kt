@@ -1,8 +1,12 @@
 package com.dnovaes.pokemontcg.singleCard.repository
 
-class PokemonTcgRepository {
+import com.dnovaes.pokemontcg.singleCard.network.PokemonTcgAPI
 
-    suspend fun getCard() {
+class PokemonTcgRepository(
+    private val tcgApi: PokemonTcgAPI
+) {
 
+    suspend fun requestCard(id: String) {
+        tcgApi.getCard(id)
     }
 }

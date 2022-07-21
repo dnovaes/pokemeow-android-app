@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "pokemeow"
 include ':app'
 include ':pokemontcg'
+include ':commons'
