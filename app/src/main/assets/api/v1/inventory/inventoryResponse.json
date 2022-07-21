@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "currencies": [
+        {
+          "title": "PokeCoins",
+          "count": 20422
+        },
+        {
+          "title": "Fishing Tokens",
+          "count": 0
+        },
+        {
+          "title": "Vote Coins",
+          "count": 0
+        },
+        {
+          "title": "Swap tokens",
+          "count": 0
+        }
+      ]
+    },
+    {
+      "balls": [
+        {
+          "title": "Pokeballs",
+          "count": 14
+        },
+        {
+          "title": "Greatballs",
+          "count": 5
+        },
+        {
+          "title": "Ultraballs",
+          "count": 0
+        },
+        {
+          "title": "Diveballs",
+          "count": 0
+        },
+        {
+          "title": "Masterballs",
+          "count": 0
+        }
+      ]
+    }
+  ]
+}
