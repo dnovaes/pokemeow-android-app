@@ -10,27 +10,27 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.net.Uri
-import android.util.Log
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.dnovaes.pokemeow.R
+import com.dnovaes.pokemeow.services.data.NotificationChannelAux
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-data class NotificationChannelAux(
-    val id: String,
-    val name: String,
-    val importance: Int,
-    val sound: String? = null
-)
-
-val channels = listOf(
-    NotificationChannelAux("1001", "default", IMPORTANCE_HIGH),
-    NotificationChannelAux("1002", "newOrder", IMPORTANCE_DEFAULT, "music_box"),
-    NotificationChannelAux("1003", "doorbell", IMPORTANCE_DEFAULT, "twotone_doorbell")
-)
-
 class PokemeowMessagingService: FirebaseMessagingService() {
+
+    companion object ChannelsConstants {
+        const val DEFAULT_ID = "1001"
+        const val DEFAULT_NAME = "default"
+
+        const val EVENT_RARE_CAUGHT_ID = "1002"
+        const val EVENT_RARE_CAUGHT_NAME = "rareCaught"
+    }
+
+    private val channels = listOf(
+        NotificationChannelAux(DEFAULT_ID, DEFAULT_NAME, IMPORTANCE_HIGH),
+        NotificationChannelAux(EVENT_RARE_CAUGHT_ID, EVENT_RARE_CAUGHT_NAME, IMPORTANCE_DEFAULT, "music_box"),
+    )
 
     private val notificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -38,34 +38,35 @@ class PokemeowMessagingService: FirebaseMessagingService() {
 
     override fun onCreate() {
         super.onCreate()
-        println("logd MessagingService) onCreate called")
         setupChannels()
     }
 
     override fun onNewToken(token: String) {
-        println("logd MessagingService) onNewToken: `$token`")
+        println("logd PushMessagingService) onNewToken: `$token`")
         super.onNewToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
         message.notification?.run {
-            Log.d("logd", "onMessageReceived) New push notification: ${message.notification?.title}, ${message.notification?.body}")
             if (!title.isNullOrBlank() && !body.isNullOrBlank()) {
-                val channelId = this.channelId ?: channels.first().id
-                val notification = generateIntentNotification(this.title!!, this.body!!, channelId)
+                val channelId = channelId ?: channels.first().id
+                val notification = generateIntentNotification(title!!, body!!, channelId)
                 showNotification(notification)
             }
         }
     }
 
+/*
+    // Customizable Views into PushNotification
     private fun getRemoteView(title: String, body: String): RemoteViews {
         val remoteViews = RemoteViews(this.packageName, R.layout.general_notification)
         remoteViews.setTextViewText(R.id.notification_title_id, title)
         remoteViews.setTextViewText(R.id.notification_description_id, body)
         return remoteViews
     }
+*/
 
-    private fun generateIntentNotification(title: String, body: String, channelId: String): Notification {
+    private fun generateIntentNotification(title: String, description: String, channelId: String): Notification {
         //val intent = Intent(this, OtherActivity::class.java)
         val intent = packageManager.getLaunchIntentForPackage(packageName)!!
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -77,19 +78,22 @@ class PokemeowMessagingService: FirebaseMessagingService() {
         )
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
+            .setContentIntent(pendingIntent)
+            .setContentTitle(title)
+            .setContentText(description)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(description))
             .setSmallIcon(com.google.android.gms.base.R.drawable.common_full_open_on_phone)
-            .setAutoCancel(true)
+            .setColor(ContextCompat.getColor(applicationContext, R.color.teal_200))
             .setVibrate(longArrayOf(1000, 1000, 1000, 1000))
             .setOnlyAlertOnce(true)
-            .setContentIntent(pendingIntent)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-        //builder.setContent(getRemoteView(title, "$body: $channelId"))
+            .setAutoCancel(true)
+        //builder.setContent(getRemoteView(title, "$description: $channelId"))
         return builder.build()
     }
 
     private fun showNotification(notification: Notification) {
-        println("logd showingNotification... ChannelID: ${notification.channelId}")
-        notificationManager.notify(0, notification)
+        val notificationId = System.currentTimeMillis().toInt()
+        notificationManager.notify(notificationId, notification)
     }
 
     private fun setupChannels() {
