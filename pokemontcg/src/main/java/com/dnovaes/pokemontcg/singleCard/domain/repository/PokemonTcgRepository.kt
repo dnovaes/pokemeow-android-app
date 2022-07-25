@@ -1,12 +1,17 @@
-package com.dnovaes.pokemontcg.singleCard.repository
+package com.dnovaes.pokemontcg.singleCard.domain.repository
 
-import com.dnovaes.pokemontcg.singleCard.network.PokemonTcgAPI
+import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
+
+interface TcgRepositoryInterface {
+    suspend fun requestCard(id: String)
+}
 
 class PokemonTcgRepository(
-    private val tcgApi: PokemonTcgAPI
-) {
+    private val tcgApiInterface: PokemonTcgAPIInterface
+): TcgRepositoryInterface {
 
-    suspend fun requestCard(id: String) {
-        tcgApi.getCard(id)
+    override suspend fun requestCard(id: String) {
+        tcgApiInterface.getCard(id)
     }
+
 }

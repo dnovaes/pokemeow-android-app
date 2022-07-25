@@ -1,4 +1,4 @@
-package com.dnovaes.pokemontcg.singleCard.network
+package com.dnovaes.pokemontcg.singleCard.data.remote.network
 
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
@@ -16,7 +16,9 @@ data class TcgDataResponse(
     val hp: String
 )
 
-interface PokemonTcgAPI {
+const val TCG_SERVICE_URL = "https://api.pokemontcg.io/"
+
+interface PokemonTcgAPIInterface {
 
     /*
     https://docs.pokemontcg.io/api-reference/cards/get-card
