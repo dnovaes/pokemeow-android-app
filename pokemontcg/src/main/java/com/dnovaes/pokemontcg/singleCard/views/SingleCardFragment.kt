@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.databinding.FragmentSecondBinding
@@ -21,7 +22,7 @@ class SingleCardFragment : BaseFragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val singleCardViewModel: SingleCardViewModel by viewModels()
+    private val viewModel: SingleCardViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +36,7 @@ class SingleCardFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindElements()
+        subscribeUi()
     }
 
     override fun onDestroyView() {
@@ -43,11 +45,20 @@ class SingleCardFragment : BaseFragment() {
     }
 
     private fun bindElements() {
-        binding.buttonSecond.setOnClickListener {
+        binding.btnPrevious.setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
         binding.btnSingleCard.setOnClickListener {
-            singleCardViewModel.getCard("xy1-1")
+            viewModel.getCard("xy1-1")
+        }
+    }
+
+    private fun subscribeUi() {
+        viewModel.cardLiveData.observe(viewLifecycleOwner) {
+            Glide.with(this)
+                .load(it.data.images.small)
+                .centerCrop()
+                .into(binding.imgSingleCard)
         }
     }
 }

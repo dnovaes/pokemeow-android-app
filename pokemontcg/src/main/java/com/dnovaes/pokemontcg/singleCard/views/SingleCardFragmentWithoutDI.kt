@@ -76,7 +76,7 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
     }
 
     private fun bindElements() {
-        binding.buttonSecond.setOnClickListener {
+        binding.btnPrevious.setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
         binding.btnSingleCard.setOnClickListener {
