@@ -1,5 +1,6 @@
-package com.dnovaes.pokemontcg.singleCard.domain
+package com.dnovaes.pokemontcg.singleCard.domain.di
 
+import com.dnovaes.commons.data.network.DispatcherInterface
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.PokemonTcgRepository
 import com.dnovaes.pokemontcg.singleCard.domain.repository.TcgRepositoryInterface
@@ -14,8 +15,9 @@ class TcgNetworkDomainModule {
 
     @Provides
     fun providesTcgRepository(
-        tcgService: PokemonTcgAPIInterface
+        tcgService: PokemonTcgAPIInterface,
+        dispatcher: DispatcherInterface
     ) : TcgRepositoryInterface {
-        return PokemonTcgRepository(tcgService)
+        return PokemonTcgRepository(tcgService, dispatcher)
     }
 }

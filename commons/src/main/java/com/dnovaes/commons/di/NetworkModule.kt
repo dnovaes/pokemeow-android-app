@@ -1,7 +1,9 @@
 package com.dnovaes.commons.di
 
+import com.dnovaes.commons.data.network.DispatcherInterface
 import com.dnovaes.commons.data.network.LoggerInterceptor
 import com.dnovaes.commons.data.network.PokeLoggerInterceptorInterface
+import com.dnovaes.commons.data.network.TcgDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +34,8 @@ class NetworkModule {
     fun providesJsonKotlinSerializationConfig(): Json {
         return Json { ignoreUnknownKeys = true }
     }
+
+    @Provides
+    fun providesDispatcher(): DispatcherInterface = TcgDispatcher()
 
 }

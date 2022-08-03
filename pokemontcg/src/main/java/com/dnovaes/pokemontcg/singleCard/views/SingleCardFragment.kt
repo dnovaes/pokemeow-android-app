@@ -9,14 +9,14 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.databinding.FragmentSecondBinding
+import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SingleCardFragment : BaseFragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentSingleCardBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -28,8 +28,7 @@ class SingleCardFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentSingleCardBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -46,7 +45,7 @@ class SingleCardFragment : BaseFragment() {
 
     private fun bindElements() {
         binding.btnPrevious.setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_SingleCardFragment_to_LauncherFragment)
         }
         binding.btnSingleCard.setOnClickListener {
             viewModel.getCard("xy1-1")
@@ -55,10 +54,12 @@ class SingleCardFragment : BaseFragment() {
 
     private fun subscribeUi() {
         viewModel.cardLiveData.observe(viewLifecycleOwner) {
-            Glide.with(this)
-                .load(it.data.images.small)
-                .centerCrop()
-                .into(binding.imgSingleCard)
+            it.result?.let { card ->
+                Glide.with(this)
+                    .load(card.images.small)
+                    .centerCrop()
+                    .into(binding.imgSingleCard)
+            }
         }
     }
 }

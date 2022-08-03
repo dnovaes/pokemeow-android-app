@@ -9,7 +9,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
-import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 

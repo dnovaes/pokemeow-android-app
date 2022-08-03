@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.dnovaes.commons.data.network.TcgDispatcher
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.databinding.FragmentSecondBinding
+import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.PokemonTcgRepository
+import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapper
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -25,7 +27,7 @@ import retrofit2.Retrofit
  */
 class SingleCardFragmentWithoutDI : BaseFragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentSingleCardBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -50,9 +52,10 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
 
     private val singleCardViewModel: SingleCardViewModel by viewModels{
         val tcgService = buildRetrofit().create(PokemonTcgAPIInterface::class.java)
-        val tcgRepository = PokemonTcgRepository(tcgService)
+        val tcgRepository = PokemonTcgRepository(tcgService, TcgDispatcher())
+        val mapper = SingleCardMapper()
         createWithFactory {
-            SingleCardViewModel(tcgRepository)
+            SingleCardViewModel(tcgRepository, mapper)
         }
     }
 
@@ -61,7 +64,7 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentSingleCardBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -77,7 +80,7 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
 
     private fun bindElements() {
         binding.btnPrevious.setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_SingleCardFragment_to_LauncherFragment)
         }
         binding.btnSingleCard.setOnClickListener {
             singleCardViewModel.getCard("xy1-1")

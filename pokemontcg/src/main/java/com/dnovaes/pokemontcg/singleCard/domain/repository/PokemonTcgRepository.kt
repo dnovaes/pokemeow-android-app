@@ -1,30 +1,33 @@
 package com.dnovaes.pokemontcg.singleCard.domain.repository
 
+import com.dnovaes.commons.data.network.DispatcherInterface
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
-import com.dnovaes.pokemontcg.singleCard.domain.model.TcgCardServerResponse
-import kotlinx.coroutines.Dispatchers
+import com.dnovaes.pokemontcg.singleCard.domain.model.CardResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 interface TcgRepositoryInterface {
-    suspend fun requestCard(id: String): Flow<TcgCardServerResponse>
+    suspend fun requestCard(id: String): Flow<Result<CardResponse>>
 }
 
 class PokemonTcgRepository(
-    private val tcgApiInterface: PokemonTcgAPIInterface
+    private val tcgApiInterface: PokemonTcgAPIInterface,
+    private val dispatcher: DispatcherInterface
 ): TcgRepositoryInterface {
 
-    override suspend fun requestCard(id: String): Flow<TcgCardServerResponse> {
+    override suspend fun requestCard(id: String): Flow<Result<CardResponse>> {
         return flow {
-            kotlin.runCatching {
+            runCatching {
                 tcgApiInterface.getCard(id)
             }.onFailure {
                 println("logd Failure during api request: ${it.stackTraceToString()}")
+                val failure = Result.failure<CardResponse>(it)
+                emit(failure)
             }.onSuccess {
-                emit(it)
+                emit(Result.success(it))
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(dispatcher.io)
     }
 
 }

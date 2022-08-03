@@ -10,7 +10,7 @@ class LoggerInterceptor: Interceptor, PokeLoggerInterceptorInterface {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
             .newBuilder()
-            .addHeader("X-Api-Key", "3079204f-ecb6-425e-9332-eed64e3608e1")
+            .addHeader("X-Api-Key", "")
             .build()
 
         println("logd ==== REQUEST ====")

@@ -3,26 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/LauncherFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.dnovaes.pokemontcg.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/LauncherFragment"
+        android:name="com.dnovaes.pokemontcg.LauncherFragment"
+        android:label="@string/launcher_fragment_label"
+        tools:layout="@layout/fragment_tcg_launcher">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_LauncherFragment_to_SingleCardFragment"
             app:destination="@id/SingleCardFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/SingleCardFragment"
         android:name="com.dnovaes.pokemontcg.singleCard.views.SingleCardFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:label="@string/single_card_fragment_label"
+        tools:layout="@layout/fragment_single_card">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_SingleCardFragment_to_LauncherFragment"
+            app:destination="@id/LauncherFragment" />
     </fragment>
 </navigation>

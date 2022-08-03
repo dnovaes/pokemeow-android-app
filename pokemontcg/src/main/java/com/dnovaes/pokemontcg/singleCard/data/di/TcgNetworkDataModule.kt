@@ -1,4 +1,4 @@
-package com.dnovaes.pokemontcg.singleCard.data
+package com.dnovaes.pokemontcg.singleCard.data.di
 
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.TCG_SERVICE_URL
