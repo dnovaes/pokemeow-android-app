@@ -3,14 +3,13 @@ package com.dnovaes.commons.data.network
 import okhttp3.Interceptor
 import okhttp3.Response
 
-interface PokeLoggerInterceptorInterface
+interface PokeLoggerInterceptorInterface: Interceptor
 
-class LoggerInterceptor: Interceptor, PokeLoggerInterceptorInterface {
+class LoggerInterceptor: PokeLoggerInterceptorInterface {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
             .newBuilder()
-            .addHeader("X-Api-Key", "")
             .build()
 
         println("logd ==== REQUEST ====")
