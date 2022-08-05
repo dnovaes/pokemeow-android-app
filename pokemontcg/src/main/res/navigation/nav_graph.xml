@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LauncherFragment">
+
+    <fragment
+        android:id="@+id/LauncherFragment"
+        android:name="com.dnovaes.pokemontcg.LauncherFragment"
+        android:label="@string/launcher_fragment_label"
+        tools:layout="@layout/fragment_tcg_launcher">
+
+        <action
+            android:id="@+id/action_LauncherFragment_to_SingleCardFragment"
+            app:destination="@id/SingleCardFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/SingleCardFragment"
+        android:name="com.dnovaes.pokemontcg.singleCard.views.SingleCardFragment"
+        android:label="@string/single_card_fragment_label"
+        tools:layout="@layout/fragment_single_card">
+
+        <action
+            android:id="@+id/action_SingleCardFragment_to_LauncherFragment"
+            app:destination="@id/LauncherFragment" />
+    </fragment>
+</navigation>
