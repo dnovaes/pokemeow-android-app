@@ -11,6 +11,7 @@ import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,6 +60,9 @@ class SingleCardFragment : BaseFragment() {
                     .load(card.images.small)
                     .centerCrop()
                     .into(binding.imgSingleCard)
+            }
+            it.error?.let { error ->
+                Snackbar.make(binding.root, getString(error.stringRes), Snackbar.LENGTH_LONG).show()
             }
         }
     }

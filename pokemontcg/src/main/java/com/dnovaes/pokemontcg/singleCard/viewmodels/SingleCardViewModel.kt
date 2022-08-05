@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnovaes.commons.data.model.UIError
 import com.dnovaes.commons.data.model.UIViewState
 import com.dnovaes.commons.data.model.withError
 import com.dnovaes.commons.data.model.withResult
+import com.dnovaes.pokemontcg.singleCard.domain.model.CardResponseInterface
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.TcgRepositoryInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapperInterface
@@ -25,21 +27,31 @@ class SingleCardViewModel @Inject constructor(
 
     fun getCard(id: String) {
         viewModelScope.launch {
-            pkmTcgRepository.requestCard(id).collect {
-                if (it.isSuccess) {
-                    var cardState = UIViewState<CardInterface>()
-                    val content = it.getOrNull()
-                    content?.let {
-                        cardState = cardState
-                            .withResult(singleCardMapper.mapCard(content))
-                            .withError(null)
-                        _cardLiveData.postValue(cardState)
-                    }
-                } else {
-                    //_cardLiveData.postValue()
+            pkmTcgRepository.requestCard(id).collect { result ->
+                handleSingleCardResponse(result)?.let {
+                    _cardLiveData.postValue(it)
                 }
             }
         }
     }
 
+    private fun handleSingleCardResponse(
+        result: Result<CardResponseInterface>
+    ): UIViewState<CardInterface>? =
+        if (result.isSuccess) {
+            val content = result.getOrNull()
+            content?.let {
+                UIViewState<CardInterface>()
+                    .withResult(singleCardMapper.mapCard(content))
+                    .withError(null)
+            }
+        } else {
+            result.exceptionOrNull()?.let { throwable ->
+                //TODO
+                //val exception = mapException(throwable)
+                //logger.info(throwable)
+                val uiError = UIError(throwable = throwable)
+                UIViewState<CardInterface>().withError(uiError)
+            }
+        }
 }
