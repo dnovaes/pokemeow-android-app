@@ -38,6 +38,16 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    sourceSets {
+        main {
+            res.srcDirs = [
+                'src/main/res/layouts/singleCard',
+                'src/main/res/layouts',
+                'src/main/res/',
+            ]
+        }
+    }
 }
 
 dependencies {
