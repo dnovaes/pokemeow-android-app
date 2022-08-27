@@ -79,9 +79,6 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
     }
 
     private fun bindElements() {
-        binding.btnPrevious.setOnClickListener {
-            findNavController().navigate(R.id.action_SingleCardFragment_to_LauncherFragment)
-        }
         binding.btnSingleCard.setOnClickListener {
             singleCardViewModel.getCard("xy1-1")
         }
