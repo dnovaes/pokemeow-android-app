@@ -1,5 +1,6 @@
 package com.dnovaes.pokemontcg.singleCard.viewmodels
 
+import android.app.appsearch.SearchResult
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,8 @@ import com.dnovaes.commons.data.model.UIError
 import com.dnovaes.commons.data.model.UIViewState
 import com.dnovaes.commons.data.model.withError
 import com.dnovaes.commons.data.model.withResult
+import com.dnovaes.pokemontcg.commonFeature.domain.SearchTcgSets
+import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,10 +25,8 @@ class SingleCardViewModel @Inject constructor(
     private val _cardLiveData: MutableLiveData<UIViewState<CardInterface>> = MutableLiveData()
     val cardLiveData: LiveData<UIViewState<CardInterface>> = _cardLiveData
 
-/*
-    private val _setsLiveData: MutableLiveData<UIViewState<SetsInterface>> = MutableLiveData()
-    val setsLiveData: LiveData<UIViewState<SetInterface>> = _setsLiveData
-*/
+    private val _setsLiveData: MutableLiveData<UIViewState<SearchTcgSets>> = MutableLiveData()
+    val setsLiveData: LiveData<UIViewState<SearchTcgSets>> = _setsLiveData
 
     fun getCard(id: String) {
         viewModelScope.launch {
@@ -60,8 +61,28 @@ class SingleCardViewModel @Inject constructor(
     fun getExpansionSets() {
         viewModelScope.launch {
             singleCardUseCase.requestSets().collect { result ->
-                println("logd $result")
+                handleSetsResponse(result)?.let {
+                    _setsLiveData.postValue(it)
+                }
             }
         }
     }
+
+    private fun handleSetsResponse(response: Result<List<TcgSetInterface>>): UIViewState<SearchTcgSets>? =
+        if (response.isSuccess) {
+            val content = response.getOrNull()
+            content?.let {
+                UIViewState<SearchTcgSets>()
+                    .withResult(SearchTcgSets(it))
+                    .withError(null)
+            }
+        } else {
+            response.exceptionOrNull()?.let { throwable ->
+                //TODO
+                //val exception = mapException(throwable)
+                //logger.info(throwable)
+                val uiError = UIError(throwable = throwable)
+                UIViewState<SearchTcgSets>().withError(uiError)
+            }
+        }
 }

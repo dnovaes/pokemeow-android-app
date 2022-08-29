@@ -11,12 +11,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <ImageView
+            android:id="@+id/bsheet_set_img"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:height="20sp"
-            android:text="Lost Origin"
             android:textAlignment="center" />
 
         <com.google.android.material.textfield.TextInputLayout

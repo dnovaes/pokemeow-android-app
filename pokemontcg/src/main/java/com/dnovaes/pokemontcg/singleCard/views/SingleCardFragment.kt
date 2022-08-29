@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.views.BaseFragment
@@ -75,8 +76,15 @@ class SingleCardFragment : BaseFragment() {
     private fun showBottomSheet() {
         val bottomSheet = BottomSheetDialog(this.requireContext())
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
+
+        val expSetImageView = bottomSheet.findViewById<ImageView>(R.id.bsheet_set_img)!!
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
+        viewModel.setsLiveData.value?.result?.let { sets ->
+            Glide.with(this)
+                .load(sets.result.first().images.logo)
+                .into(expSetImageView)
+        }
         cardNumberInputLayout.setEndIconOnClickListener {
             val cardNumber = cardNumberEditText.text
             viewModel.getCard("xy1-${cardNumber}")
