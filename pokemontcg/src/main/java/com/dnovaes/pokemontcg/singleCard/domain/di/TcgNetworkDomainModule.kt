@@ -2,8 +2,8 @@ package com.dnovaes.pokemontcg.singleCard.domain.di
 
 import com.dnovaes.commons.data.network.DispatcherInterface
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
-import com.dnovaes.pokemontcg.singleCard.domain.repository.PokemonTcgRepository
-import com.dnovaes.pokemontcg.singleCard.domain.repository.TcgRepositoryInterface
+import com.dnovaes.pokemontcg.commonFeature.repository.PokemonTcgRepository
+import com.dnovaes.pokemontcg.commonFeature.repository.TcgRepositoryInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

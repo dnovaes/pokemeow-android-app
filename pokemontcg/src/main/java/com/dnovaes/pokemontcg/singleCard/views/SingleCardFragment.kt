@@ -38,6 +38,7 @@ class SingleCardFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindElements()
+        loadScreenData()
         setObservers()
     }
 
@@ -51,6 +52,10 @@ class SingleCardFragment : BaseFragment() {
         binding.btnSingleCard.setOnClickListener {
             showBottomSheet()
         }
+    }
+
+    private fun loadScreenData() {
+        viewModel.getExpansionSets()
     }
 
     private fun setObservers() {

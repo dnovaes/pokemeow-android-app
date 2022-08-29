@@ -7,13 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.dnovaes.commons.data.network.TcgDispatcher
 import com.dnovaes.commons.views.BaseFragment
-import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
-import com.dnovaes.pokemontcg.singleCard.domain.repository.PokemonTcgRepository
+import com.dnovaes.pokemontcg.commonFeature.repository.PokemonTcgRepository
+import com.dnovaes.pokemontcg.commonFeature.repository.mapper.TcgMapper
+import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCase
 import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapper
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -53,9 +53,11 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
     private val singleCardViewModel: SingleCardViewModel by viewModels{
         val tcgService = buildRetrofit().create(PokemonTcgAPIInterface::class.java)
         val tcgRepository = PokemonTcgRepository(tcgService, TcgDispatcher())
-        val mapper = SingleCardMapper()
+        val singleCardMapper = SingleCardMapper()
+        val mapper = TcgMapper()
+        val singleCardUseCase = SingleCardUseCase(tcgRepository, singleCardMapper, mapper)
         createWithFactory {
-            SingleCardViewModel(tcgRepository, mapper)
+            SingleCardViewModel(singleCardUseCase)
         }
     }
 

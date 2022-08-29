@@ -8,26 +8,28 @@ import com.dnovaes.commons.data.model.UIError
 import com.dnovaes.commons.data.model.UIViewState
 import com.dnovaes.commons.data.model.withError
 import com.dnovaes.commons.data.model.withResult
-import com.dnovaes.pokemontcg.singleCard.domain.model.CardResponseInterface
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
-import com.dnovaes.pokemontcg.singleCard.domain.repository.TcgRepositoryInterface
-import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapperInterface
+import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SingleCardViewModel @Inject constructor(
-    private val pkmTcgRepository: TcgRepositoryInterface,
-    private val singleCardMapper: SingleCardMapperInterface
+    private val singleCardUseCase: SingleCardUseCaseInterface,
 ): ViewModel() {
 
     private val _cardLiveData: MutableLiveData<UIViewState<CardInterface>> = MutableLiveData()
     val cardLiveData: LiveData<UIViewState<CardInterface>> = _cardLiveData
 
+/*
+    private val _setsLiveData: MutableLiveData<UIViewState<SetsInterface>> = MutableLiveData()
+    val setsLiveData: LiveData<UIViewState<SetInterface>> = _setsLiveData
+*/
+
     fun getCard(id: String) {
         viewModelScope.launch {
-            pkmTcgRepository.requestCard(id).collect { result ->
+            singleCardUseCase.requestCard(id).collect { result ->
                 handleSingleCardResponse(result)?.let {
                     _cardLiveData.postValue(it)
                 }
@@ -36,13 +38,13 @@ class SingleCardViewModel @Inject constructor(
     }
 
     private fun handleSingleCardResponse(
-        result: Result<CardResponseInterface>
+        result: Result<CardInterface>
     ): UIViewState<CardInterface>? =
         if (result.isSuccess) {
             val content = result.getOrNull()
             content?.let {
                 UIViewState<CardInterface>()
-                    .withResult(singleCardMapper.mapCard(content))
+                    .withResult(it)
                     .withError(null)
             }
         } else {
@@ -54,4 +56,12 @@ class SingleCardViewModel @Inject constructor(
                 UIViewState<CardInterface>().withError(uiError)
             }
         }
+
+    fun getExpansionSets() {
+        viewModelScope.launch {
+            singleCardUseCase.requestSets().collect { result ->
+                println("logd $result")
+            }
+        }
+    }
 }
