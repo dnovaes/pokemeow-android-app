@@ -73,7 +73,7 @@ class SingleCardViewModel @Inject constructor(
             val content = response.getOrNull()
             content?.let {
                 UIViewState<SearchTcgSets>()
-                    .withResult(SearchTcgSets(it))
+                    .withResult(SearchTcgSets(null, it))
                     .withError(null)
             }
         } else {
@@ -85,4 +85,12 @@ class SingleCardViewModel @Inject constructor(
                 UIViewState<SearchTcgSets>().withError(uiError)
             }
         }
+
+    fun selectSet(id: String) {
+        val prevState = _setsLiveData.value?.result ?: return
+        val newState = UIViewState<SearchTcgSets>()
+            .withResult(SearchTcgSets(id, prevState.result))
+            .withError(null)
+        _setsLiveData.postValue(newState)
+    }
 }

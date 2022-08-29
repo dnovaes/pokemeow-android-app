@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.constraintlayout.helper.widget.Carousel
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
+import com.dnovaes.pokemontcg.commonFeature.domain.SearchTcgSets
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -77,19 +79,38 @@ class SingleCardFragment : BaseFragment() {
         val bottomSheet = BottomSheetDialog(this.requireContext())
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
 
-        val expSetImageView = bottomSheet.findViewById<ImageView>(R.id.bsheet_set_img)!!
+        val expSetCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
+        viewModel.setsLiveData.value?.result?.let { sets ->
+            setupCarousel(expSetCarousel, sets)
+        }
+
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
-        viewModel.setsLiveData.value?.result?.let { sets ->
-            Glide.with(this)
-                .load(sets.result.first().images.logo)
-                .into(expSetImageView)
-        }
         cardNumberInputLayout.setEndIconOnClickListener {
             val cardNumber = cardNumberEditText.text
-            viewModel.getCard("xy1-${cardNumber}")
+            val selectedExpansionSet = viewModel.setsLiveData.value?.result?.selected ?: ""
+            viewModel.getCard("$selectedExpansionSet-${cardNumber}")
             bottomSheet.dismiss()
         }
         bottomSheet.show()
+    }
+
+    private fun setupCarousel(expSetCarousel: Carousel, sets: SearchTcgSets) {
+        val context = this
+        expSetCarousel.setAdapter(object: Carousel.Adapter {
+            override fun count() = sets.result.size
+
+            override fun populate(view: View?, index: Int) {
+                val imgView = view as ImageView
+                val currSet = sets.result[index]
+                viewModel.selectSet(currSet.id)
+                Glide.with(context)
+                    .load(currSet.images.logo)
+                    .into(imgView)
+            }
+
+            override fun onNewItem(index: Int) { }
+
+        })
     }
 }

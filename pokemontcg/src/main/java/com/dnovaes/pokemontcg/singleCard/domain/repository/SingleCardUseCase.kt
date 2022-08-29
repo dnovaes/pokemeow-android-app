@@ -22,13 +22,15 @@ class SingleCardUseCase(
 
     override suspend fun requestSets(): Flow<Result<List<TcgSetInterface>>> {
         return flow {
-            pkmTcgRepository.requestSets().collect {
-                if (it.isSuccess) {
-                    val modelUi = tcgMapper.mapSet(it.getOrNull()!!)
-                    emit(Result.success(modelUi))
+            pkmTcgRepository.requestSets().collect { result ->
+                if (result.isSuccess) {
+                    result.getOrNull()?.let { searchResponse ->
+                        val modelUi = tcgMapper.mapSet(searchResponse)
+                        emit(Result.success(modelUi))
+                    }
                 } else {
                     try {
-                        emit(it as Result<List<TcgSet>>)
+                        emit(result as Result<List<TcgSet>>)
                     } catch (e: Exception) {
                         println("Exception on cast result.failure ${::requestSets.name}]")
                     }

@@ -12,7 +12,8 @@ interface TcgMapperInterface {
 class TcgMapper: TcgMapperInterface {
 
     override fun mapSet(setResponse: SetSearchResponseInterface): List<TcgSetInterface> {
-        return setResponse.data.map {
+        val regex = "\\w*tg\\b".toRegex(RegexOption.IGNORE_CASE)
+        return setResponse.data.filter { !it.id.contains(regex) }.map {
             val tcgSetImage = TcgSetImages(it.images.symbol, it.images.logo)
             TcgSet(it.id, it.name, tcgSetImage)
         }
