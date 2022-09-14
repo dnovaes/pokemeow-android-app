@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.dnovaes.commons.data.model.UIDataState
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.commonFeature.domain.TcgSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
@@ -38,8 +37,8 @@ class SingleCardFragment : BaseFragment() {
     ): View {
         _binding = FragmentSingleCardBinding.inflate(inflater, container, false)
         return binding.root
-
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindElements()
@@ -70,8 +69,8 @@ class SingleCardFragment : BaseFragment() {
     private fun observeExpansionSetsData() {
         viewModel.setsLiveData.observe(viewLifecycleOwner) {
             when (it.state) {
-                UIDataState.DONE -> hideLoading()
-                UIDataState.LOADING -> showLoading(view?.rootView as ViewGroup?)
+                UIDataState.DONE -> stopLoading()
+                UIDataState.LOADING -> showLoading()
             }
         }
     }
@@ -80,7 +79,7 @@ class SingleCardFragment : BaseFragment() {
         viewModel.cardLiveData.observe(viewLifecycleOwner) {
             when (it.state) {
                 UIDataState.DONE -> {
-                    hideLoading()
+                    stopLoading()
                     it.result?.let { card ->
                         Glide.with(this)
                             .load(card.images.small)
@@ -91,7 +90,7 @@ class SingleCardFragment : BaseFragment() {
                         Snackbar.make(binding.root, getString(error.stringRes), Snackbar.LENGTH_LONG).show()
                     }
                 }
-                UIDataState.LOADING -> showLoading(this.view?.rootView as ViewGroup?)
+                UIDataState.LOADING -> showLoading()
             }
         }
     }
