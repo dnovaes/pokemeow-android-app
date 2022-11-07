@@ -12,6 +12,9 @@ import org.junit.Test
 
 class StringExtensionsTest {
 
+    private val expectedZoneDateTimeSample: ZonedDateTime
+       = ZonedDateTime.of(2022, 10, 30, 0, 0, 0, 0, ZoneId.systemDefault())
+
     private val givenPatterns = listOf(
         "yyyy-MM-dd",
         "yyyy MM dd",
@@ -37,8 +40,6 @@ class StringExtensionsTest {
     @Test
     fun `assert conversion from date string to zonedDateTime with CANADIAN locale`() {
         // Given
-        val expectedResult = ZonedDateTime.now().with(LocalTime.MIN)
-
         // When
         val actualResults = givenStringDates.mapIndexed { i, dateString ->
             dateString.toZonedDateTimeFromCustomDate(givenPatterns[i], Locale.CANADA)
@@ -46,9 +47,9 @@ class StringExtensionsTest {
 
         // Then
         actualResults.forEach { result ->
-            assertEquals(expectedResult, result)
+            assertEquals(expectedZoneDateTimeSample, result)
             assertEquals(
-                expectedResult.format(DateTimeFormatter.BASIC_ISO_DATE),
+                expectedZoneDateTimeSample.format(DateTimeFormatter.BASIC_ISO_DATE),
                 result.format(DateTimeFormatter.BASIC_ISO_DATE)
             )
             assertEquals("OCTOBER", result.month.toString())
@@ -59,7 +60,6 @@ class StringExtensionsTest {
     @Test
     fun `assert conversion from date string to zonedDateTime with JAPAN locale`() {
         // Given
-        val expectedResult = ZonedDateTime.now().with(LocalTime.MIN)
         val regex = "[^0-9.\\/\\-\\s]".toRegex()
         //JAPAN localte doesnt have MMMM
         val givenStringDates = givenStringDates.filter {
@@ -73,9 +73,9 @@ class StringExtensionsTest {
 
         // Then
         actualResults.forEach { result ->
-            assertEquals(expectedResult, result)
+            assertEquals(expectedZoneDateTimeSample, result)
             assertEquals(
-                expectedResult.format(DateTimeFormatter.BASIC_ISO_DATE),
+                expectedZoneDateTimeSample.format(DateTimeFormatter.BASIC_ISO_DATE),
                 result.format(DateTimeFormatter.BASIC_ISO_DATE)
             )
             assertEquals("OCTOBER", result.month.toString())
@@ -117,8 +117,6 @@ class StringExtensionsTest {
     @Test
     fun `assert conversion from date string to zonedDateTime with DEFAULT locale`() {
         // Given
-        val expectedResult = ZonedDateTime.now().with(LocalTime.MIN)
-
         // When
         val actualResults = givenStringDates.mapIndexed { i, dateString ->
             dateString.toZonedDateTimeFromCustomDate(givenPatterns[i], Locale.CANADA)
@@ -126,9 +124,9 @@ class StringExtensionsTest {
 
         // Then
         actualResults.forEach { result ->
-            assertEquals(expectedResult, result)
+            assertEquals(expectedZoneDateTimeSample, result)
             assertEquals(
-                expectedResult.format(DateTimeFormatter.BASIC_ISO_DATE),
+                expectedZoneDateTimeSample.format(DateTimeFormatter.BASIC_ISO_DATE),
                 result.format(DateTimeFormatter.BASIC_ISO_DATE)
             )
             assertEquals("OCTOBER", result.month.toString())
@@ -139,8 +137,6 @@ class StringExtensionsTest {
     @Test
     fun `assert date string to localDate with CANADA locale`() {
         // Given
-        val expectedResult = ZonedDateTime.now().toLocalDate()
-
         // When
         val actualResults = givenStringDates.mapIndexed { i, dateString ->
             dateString.toLocalDate(givenPatterns[i], Locale.CANADA)
@@ -148,7 +144,7 @@ class StringExtensionsTest {
 
         // Then
         actualResults.forEach { result ->
-            assertEquals(expectedResult, result)
+            assertEquals(expectedZoneDateTimeSample.toLocalDate(), result)
             assertEquals("OCTOBER", result.month.toString())
             assertEquals(10, result.monthValue)
         }
@@ -157,8 +153,6 @@ class StringExtensionsTest {
     @Test
     fun `assert date string to localDate with DEFAULT locale`() {
         // Given
-        val expectedResult = ZonedDateTime.now().toLocalDate()
-
         // When
         val actualResults = givenStringDates.mapIndexed { i, dateString ->
             dateString.toLocalDate(givenPatterns[i])
@@ -166,7 +160,7 @@ class StringExtensionsTest {
 
         // Then
         actualResults.forEach { result ->
-            assertEquals(expectedResult, result)
+            assertEquals(expectedZoneDateTimeSample.toLocalDate(), result)
             assertEquals("OCTOBER", result.month.toString())
             assertEquals(10, result.monthValue)
         }
