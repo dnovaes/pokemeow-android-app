@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout>
+    <androidx.constraintlayout.helper.widget.Carousel
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/bsheet_expset_carousel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:carousel_forwardTransition="@id/forward"
+        app:carousel_backwardTransition="@id/backward"
+        app:carousel_previousState="@id/previous"
+        app:carousel_nextState="@id/next"
+        app:carousel_infinite="false"
+        app:carousel_firstView="@id/imageView2"
+        app:constraint_referenced_ids="imageView0,imageView1,imageView2,imageView3,imageView4"
+        tools:ignore="MissingDefaultResource" />
+</LinearLayout>
