@@ -4,14 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dnovaes.commons.data.model.UIDataState
 import com.dnovaes.commons.data.model.UIError
-import com.dnovaes.commons.data.model.UIViewState
-import com.dnovaes.commons.data.model.withError
-import com.dnovaes.commons.data.model.withResult
+import com.dnovaes.commons.data.model.uiviewstate.UIDataState
+import com.dnovaes.commons.data.model.uiviewstate.UIViewState
+import com.dnovaes.commons.data.model.uiviewstate.inDone
+import com.dnovaes.commons.data.model.uiviewstate.inProcess
+import com.dnovaes.commons.data.model.uiviewstate.withError
+import com.dnovaes.commons.data.model.uiviewstate.withResult
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
+import com.dnovaes.pokemontcg.singleCard.data.model.SingleCardUIDataProcess
+import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmSingleCard
+import com.dnovaes.pokemontcg.singleCard.data.model.asPickingPkmCardSet
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,31 +30,46 @@ class SingleCardViewModel @Inject constructor(
 
     private val _cardLiveData: MutableLiveData<UIViewState<CardInterface>> = MutableLiveData()
     val cardLiveData: LiveData<UIViewState<CardInterface>> = _cardLiveData
+    private val initialCardState = UIViewState<CardInterface>(
+        process = SingleCardUIDataProcess.LOADING_SINGLE_CARD,
+        state = UIDataState.PROCESSING
+    )
 
     private val _setsLiveData: MutableLiveData<UIViewState<TcgSetsInterface>> = MutableLiveData()
     val setsLiveData: LiveData<UIViewState<TcgSetsInterface>> = _setsLiveData
+    private val initialSetsState = UIViewState<TcgSetsInterface>(
+        process = SingleCardUIDataProcess.LOADING_CARD_SETS,
+        state = UIDataState.PROCESSING
+    )
 
-    fun getCard(id: String) {
-        val loadState = UIViewState<CardInterface>(UIDataState.LOADING)
-        _cardLiveData.postValue(loadState)
+    fun getCard(cardNumber: String) {
+        val currSetState = _setsLiveData.value ?: return
+
+        val sets = currSetState.result
+        val selectedExpansionSet = sets?.selectedId ?: sets?.collection?.last()?.id ?: ""
+        val cardSetId = "$selectedExpansionSet-${cardNumber}"
+
+        _cardLiveData.postValue(initialCardState)
+
         viewModelScope.launch {
-            singleCardUseCase.requestCard(id).collect { result ->
-                handleSingleCardResponse(result)?.let {
-                    _cardLiveData.postValue(it)
-                }
+            singleCardUseCase.requestCard(cardSetId).collect { result ->
+                handleSingleCardResponse(result)
             }
         }
     }
 
     private fun handleSingleCardResponse(
         result: Result<CardInterface>
-    ): UIViewState<CardInterface>? =
+    ) {
         if (result.isSuccess) {
             val content = result.getOrNull()
             content?.let {
-                UIViewState<CardInterface>(UIDataState.DONE)
+                val newState = initialCardState
+                    .inDone()
+                    .asLoadingPkmSingleCard()
                     .withResult(it)
                     .withError(null)
+                _cardLiveData.postValue(newState)
             }
         } else {
             result.exceptionOrNull()?.let { throwable ->
@@ -57,30 +77,34 @@ class SingleCardViewModel @Inject constructor(
                 //val exception = mapException(throwable)
                 //logger.info(throwable)
                 val uiError = UIError(throwable = throwable)
-                UIViewState<CardInterface>(UIDataState.DONE)
+                val newState = initialCardState
+                    .inDone()
+                    .asLoadingPkmSingleCard()
                     .withError(uiError)
-            }
-        }
-
-    fun getExpansionSets() {
-        val loadState = UIViewState<TcgSetsInterface>(UIDataState.LOADING)
-        _setsLiveData.postValue(loadState)
-        viewModelScope.launch {
-            singleCardUseCase.requestSets().collect { result ->
-                handleSetsResponse(result)?.let {
-                    _setsLiveData.postValue(it)
-                }
+                _cardLiveData.postValue(newState)
             }
         }
     }
 
-    private fun handleSetsResponse(response: Result<List<TcgSetInterface>>): UIViewState<TcgSetsInterface>? {
-        return if (response.isSuccess) {
+    fun getExpansionSets() {
+        _setsLiveData.postValue(initialSetsState)
+
+        viewModelScope.launch {
+            singleCardUseCase.requestSets().collect { result ->
+                handleSetsResponse(result)
+            }
+        }
+    }
+
+    private fun handleSetsResponse(response: Result<List<TcgSetInterface>>) {
+        if (response.isSuccess) {
             val content = response.getOrNull()
             content?.let {
-                UIViewState<TcgSetsInterface>(UIDataState.DONE)
+                val newState = initialSetsState
+                    .inDone()
                     .withResult(TcgSets(null, it))
                     .withError(null)
+                _setsLiveData.postValue(newState)
             }
         } else {
             response.exceptionOrNull()?.let { throwable ->
@@ -88,15 +112,27 @@ class SingleCardViewModel @Inject constructor(
                 //val exception = mapException(throwable)
                 //logger.info(throwable)
                 val uiError = UIError(throwable = throwable)
-                UIViewState<TcgSetsInterface>(UIDataState.DONE).withError(uiError)
+                val newState = initialSetsState
+                    .inDone()
+                    .withError(uiError)
+                _setsLiveData.postValue(newState)
             }
         }
     }
 
-    fun selectSet(id: String) {
-        val prevState = _setsLiveData.value?.result ?: return
-        val newState = UIViewState<TcgSetsInterface>(UIDataState.DONE)
-            .withResult(TcgSets(id, prevState.collection))
+    fun selectSet(index: Int) {
+        val currState = _setsLiveData.value ?: return
+        val setsCollection = currState.result ?: return
+        val selectedSet = setsCollection.collection[index]
+        val newState = currState
+            .inDone()
+            .asPickingPkmCardSet()
+            .withResult(
+                TcgSets(
+                    selectedId = selectedSet.id,
+                    setsCollection.collection
+                )
+            )
             .withError(null)
         _setsLiveData.postValue(newState)
     }

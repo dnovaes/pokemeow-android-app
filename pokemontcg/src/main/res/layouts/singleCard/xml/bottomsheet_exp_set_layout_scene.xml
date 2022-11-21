@@ -2,16 +2,6 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<!--
-    <ConstraintSet android:id="@+id/start">
-        <Constraint android:id="@+id/carousel" />
-    </ConstraintSet>
-
-    <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@id/carousel" />
-    </ConstraintSet>
--->
-
     <Transition
         app:constraintSetStart="@id/start"
         app:constraintSetEnd="@+id/next"

@@ -8,17 +8,19 @@ import android.widget.ImageView
 import androidx.constraintlayout.helper.widget.Carousel
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.dnovaes.commons.data.model.UIDataState
+import com.dnovaes.commons.data.model.uiviewstate.UIDataState
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
+import com.dnovaes.pokemontcg.singleCard.data.model.hasDoneLoadingPkmSets
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class SingleCardFragment : BaseFragment() {
@@ -42,7 +44,6 @@ class SingleCardFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindElements()
-        loadScreenData()
         setObservers()
     }
 
@@ -53,12 +54,8 @@ class SingleCardFragment : BaseFragment() {
 
     private fun bindElements() {
         binding.btnSingleCard.setOnClickListener {
-            showBottomSheet()
+            viewModel.getExpansionSets()
         }
-    }
-
-    private fun loadScreenData() {
-        viewModel.getExpansionSets()
     }
 
     private fun setObservers() {
@@ -67,10 +64,15 @@ class SingleCardFragment : BaseFragment() {
     }
 
     private fun observeExpansionSetsData() {
-        viewModel.setsLiveData.observe(viewLifecycleOwner) {
-            when (it.state) {
-                UIDataState.DONE -> stopLoading()
-                UIDataState.LOADING -> showLoading()
+        viewModel.setsLiveData.observe(viewLifecycleOwner) { uiData ->
+            when {
+                uiData.hasDoneLoadingPkmSets() -> {
+                    uiData.result?.let {
+                        showBottomSheet(it)
+                    }
+                    stopLoading()
+                }
+                uiData.state == UIDataState.PROCESSING -> showLoading()
             }
         }
     }
@@ -90,26 +92,24 @@ class SingleCardFragment : BaseFragment() {
                         Snackbar.make(binding.root, getString(error.stringRes), Snackbar.LENGTH_LONG).show()
                     }
                 }
-                UIDataState.LOADING -> showLoading()
+                UIDataState.PROCESSING -> showLoading()
             }
         }
     }
 
-    private fun showBottomSheet() {
-        val bottomSheet = BottomSheetDialog(this.requireContext())
+    private fun showBottomSheet(tcgSets: TcgSetsInterface) {
+        val bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
-
-        val expSetCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
-        viewModel.setsLiveData.value?.result?.let { sets ->
-            setupCarousel(expSetCarousel, sets)
-        }
-
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
+
+        val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
+        setupCarousel(setsCarousel, tcgSets)
+
         cardNumberInputLayout.setEndIconOnClickListener {
-            val cardNumber = cardNumberEditText.text
-            val selectedExpansionSet = viewModel.setsLiveData.value?.result?.selected ?: ""
-            viewModel.getCard("$selectedExpansionSet-${cardNumber}")
+            val cardNumber = cardNumberEditText.text.toString()
+            viewModel.getCard(cardNumber)
+            cardNumberEditText.setText("")
             bottomSheet.dismiss()
         }
         bottomSheet.show()
@@ -123,14 +123,15 @@ class SingleCardFragment : BaseFragment() {
             override fun populate(view: View?, index: Int) {
                 val imgView = view as ImageView
                 val currSet = sets.collection[index]
-                viewModel.selectSet(currSet.id)
+                //println("logd populating $index with set: ${currSet.id}, ${currSet.name}, with view: ${view.hashCode()}")
                 Glide.with(context)
                     .load(currSet.images.logo)
                     .into(imgView)
             }
 
-            override fun onNewItem(index: Int) { }
-
+            override fun onNewItem(index: Int) {
+                viewModel.selectSet(index)
+            }
         })
     }
 }
