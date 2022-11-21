@@ -15,6 +15,7 @@ import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.model.hasDoneLoadingPkmSets
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -102,6 +103,20 @@ class SingleCardFragment : BaseFragment() {
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
+        val behavior = bottomSheet.behavior
+        behavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED;
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                //do nothing
+            }
+
+        })
 
         val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
         setupCarousel(setsCarousel, tcgSets)
