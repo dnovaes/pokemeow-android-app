@@ -15,6 +15,7 @@ import com.dnovaes.pokemontcg.commonFeature.domain.TcgSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
 import com.dnovaes.pokemontcg.singleCard.data.model.SingleCardUIDataProcess
+import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmCardSets
 import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmSingleCard
 import com.dnovaes.pokemontcg.singleCard.data.model.asPickingPkmCardSet
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
@@ -87,13 +88,25 @@ class SingleCardViewModel @Inject constructor(
     }
 
     fun getExpansionSets() {
-        _setsLiveData.postValue(initialSetsState)
+        _setsLiveData.value?.let {
+            postCachedSets(it)
+        } ?: run {
+            _setsLiveData.postValue(initialSetsState)
 
-        viewModelScope.launch {
-            singleCardUseCase.requestSets().collect { result ->
-                handleSetsResponse(result)
+            viewModelScope.launch {
+                singleCardUseCase.requestSets().collect { result ->
+                    handleSetsResponse(result)
+                }
             }
         }
+    }
+
+    private fun postCachedSets(uiData: UIViewState<TcgSetsInterface>) {
+        val newState = uiData
+            .asLoadingPkmCardSets()
+            .inDone()
+            .withError(null)
+        _setsLiveData.postValue(newState)
     }
 
     private fun handleSetsResponse(response: Result<List<TcgSetInterface>>) {
