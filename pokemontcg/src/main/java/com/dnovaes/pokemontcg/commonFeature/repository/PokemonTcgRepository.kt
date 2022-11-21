@@ -22,7 +22,10 @@ class PokemonTcgRepository(
     override suspend fun requestSets(): Flow<Result<SetSearchResponse>> {
         return flow {
             runCatching {
-                tcgApiInterface.getAllSets("name,id,images")
+                tcgApiInterface.getAllSets(
+                    select = "name,id,images",
+                    orderBy = "-releaseDate"
+                )
             }.onFailure {
                 emit(processErrorResponse<SetSearchResponse>(it))
             }.onSuccess {

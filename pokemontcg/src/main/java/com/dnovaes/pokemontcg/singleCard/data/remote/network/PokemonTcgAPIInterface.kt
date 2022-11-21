@@ -20,7 +20,10 @@ interface PokemonTcgAPIInterface {
     https://docs.pokemontcg.io/api-reference/sets/search-sets/
      */
     @GET("/v2/sets?")
-    suspend fun getAllSets(@Query("select") select: String): SetSearchResponse
+    suspend fun getAllSets(
+        @Query("select") select: String,
+        @Query("orderBy") orderBy: String
+    ): SetSearchResponse
 
 
 }
