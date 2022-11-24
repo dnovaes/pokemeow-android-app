@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 interface CardDataResponseInterface: ServerResponseInterface {
     val id: String
     val name: String
-    val hp: String
+    val hp: String?
     val images: CardImagesResponseInterface
 }
 
@@ -14,6 +14,6 @@ interface CardDataResponseInterface: ServerResponseInterface {
 data class CardDataResponse(
     override val id: String,
     override val name: String,
-    override val hp: String,
+    override val hp: String? = null,
     override val images: CardImagesResponse
 ): CardDataResponseInterface
