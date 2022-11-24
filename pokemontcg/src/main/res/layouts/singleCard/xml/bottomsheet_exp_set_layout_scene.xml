@@ -21,8 +21,77 @@
             app:touchAnchorSide="right" />
     </Transition>
 
-    <ConstraintSet android:id="@+id/start"/>
-    <ConstraintSet android:id="@+id/next"/>
-    <ConstraintSet android:id="@+id/previous"/>
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/imageViewCloseRight"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="150dp" />
+        <Constraint
+            android:id="@+id/imageViewCloseLeft"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="-150dp" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/next">
+        <Constraint
+            android:id="@+id/imageViewCloseRight"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:translationX="0dp" />
+        <Constraint
+            android:id="@+id/imageViewCenter"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="-150dp" />
+        <Constraint
+            android:id="@+id/imageViewCloseLeft"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="-300dp" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/previous">
+        <Constraint
+            android:id="@+id/imageViewCloseRight"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="300dp" />
+        <Constraint
+            android:id="@+id/imageViewCenter"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:translationX="150dp" />
+        <Constraint
+            android:id="@+id/imageViewCloseLeft"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/carrousel_set_img_view_height"
+            android:alpha="0.2"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:translationX="0dp" />
+    </ConstraintSet>
 
 </MotionScene>

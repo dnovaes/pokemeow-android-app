@@ -12,7 +12,7 @@
         app:carousel_previousState="@id/previous"
         app:carousel_nextState="@id/next"
         app:carousel_infinite="false"
-        app:carousel_firstView="@id/imageView2"
-        app:constraint_referenced_ids="imageView0,imageView1,imageView2,imageView3,imageView4"
+        app:carousel_firstView="@id/imageViewCenter"
+        app:constraint_referenced_ids="imageViewOuterLeft,imageViewCloseLeft,imageViewCenter,imageViewCloseRight,imageViewOuterRight"
         tools:ignore="MissingDefaultResource" />
 </LinearLayout>

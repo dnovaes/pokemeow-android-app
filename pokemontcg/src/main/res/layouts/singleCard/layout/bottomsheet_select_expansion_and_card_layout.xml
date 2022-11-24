@@ -18,40 +18,24 @@
                 app:layoutDescription="@xml/bottomsheet_exp_set_layout_scene">
 
                 <ImageView
-                    android:id="@+id/imageView0"
+                    android:id="@+id/imageViewCloseLeft"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:alpha="0.2"
-                    app:carousel_emptyViewsBehavior="gone" />
-
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="@dimen/carrousel_set_img_view_height"
                     android:alpha="0.2" />
 
                 <ImageView
-                    android:id="@+id/imageView2"
+                    android:id="@+id/imageViewCloseRight"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp" />
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="@dimen/carrousel_set_img_view_height"
                     android:alpha="0.2" />
 
                 <ImageView
-                    android:id="@+id/imageView4"
+                    android:id="@+id/imageViewCenter"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:alpha="0.2"
-                    app:carousel_emptyViewsBehavior="gone" />
+                    android:layout_height="@dimen/carrousel_set_img_view_height"
+                    android:paddingHorizontal="15dp"/>
 
                 <androidx.constraintlayout.helper.widget.Carousel
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    xmlns:tools="http://schemas.android.com/tools"
                     android:id="@+id/bsheet_expset_carousel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -60,8 +44,8 @@
                     app:carousel_previousState="@id/previous"
                     app:carousel_nextState="@id/next"
                     app:carousel_infinite="true"
-                    app:carousel_firstView="@id/imageView2"
-                    app:constraint_referenced_ids="imageView0,imageView1,imageView2,imageView3,imageView4"
+                    app:carousel_firstView="@id/imageViewCenter"
+                    app:constraint_referenced_ids="imageViewCloseLeft,imageViewCenter,imageViewCloseRight"
                     tools:ignore="MissingDefaultResource" />
             </androidx.constraintlayout.motion.widget.MotionLayout>
 
