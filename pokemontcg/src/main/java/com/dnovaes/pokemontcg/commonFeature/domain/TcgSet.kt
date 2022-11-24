@@ -12,4 +12,6 @@ class TcgSet(
     override val id: String,
     override val name: String,
     override val images: TcgSetImages
-): TcgSetInterface
+): TcgSetInterface {
+    override fun toString(): String = "{$id, $name}"
+}
