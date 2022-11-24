@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.constraintlayout.helper.widget.Carousel
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.data.model.uiviewstate.UIDataState
+import com.dnovaes.commons.utilities.extensions.makesNotDraggable
+import com.dnovaes.commons.utilities.extensions.onDone
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
@@ -103,28 +106,19 @@ class SingleCardFragment : BaseFragment() {
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
-        val behavior = bottomSheet.behavior
-        behavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                    behavior.state = BottomSheetBehavior.STATE_EXPANDED;
-                }
-            }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                //do nothing
-            }
-
-        })
+        bottomSheet.makesNotDraggable()
 
         val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
         setupCarousel(setsCarousel, tcgSets)
 
+        cardNumberEditText.onDone {
+            processBottomSheetCardNumber(cardNumberEditText)
+            bottomSheet.dismiss()
+        }
+
         cardNumberInputLayout.setEndIconOnClickListener {
-            val cardNumber = cardNumberEditText.text.toString()
-            viewModel.getCard(cardNumber)
-            cardNumberEditText.setText("")
+            processBottomSheetCardNumber(cardNumberEditText)
             bottomSheet.dismiss()
         }
         bottomSheet.show()
@@ -148,5 +142,11 @@ class SingleCardFragment : BaseFragment() {
                 viewModel.selectSet(index)
             }
         })
+    }
+
+    private fun processBottomSheetCardNumber(editText: EditText) {
+        val cardNumber = editText.text.toString()
+        viewModel.getCard(cardNumber)
+        editText.setText("")
     }
 }
