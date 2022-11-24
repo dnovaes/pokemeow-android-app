@@ -54,7 +54,7 @@
             android:id="@+id/input_layout_card_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Card Number"
+            android:hint="Type a card number"
             app:prefixText="#"
             app:prefixTextColor="@color/blue"
             app:endIconDrawable="@android:drawable/ic_menu_search"
