@@ -102,15 +102,10 @@ class SingleCardFragment : BaseFragment() {
     }
 
     private fun showBottomSheet(tcgSets: SingleCardSetsInterface) {
-        val bottomSheet = BottomSheetDialog(requireContext())
-        bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
+        val bottomSheet = buildSetsBottomSheet(tcgSets)
+
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
-
-        bottomSheet.setNotDraggable()
-
-        val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
-        setupCarousel(setsCarousel, tcgSets.collection)
 
         cardNumberEditText.onDone {
             processBottomSheetCardNumber(cardNumberEditText)
@@ -122,6 +117,14 @@ class SingleCardFragment : BaseFragment() {
             bottomSheet.dismiss()
         }
         bottomSheet.show()
+    }
+
+    private fun buildSetsBottomSheet(tcgSets: SingleCardSetsInterface) = BottomSheetDialog(requireContext()).apply {
+        setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
+        setNotDraggable()
+        findViewById<Carousel>(R.id.bsheet_expset_carousel)?.let {
+            setupCarousel(it, tcgSets.collection)
+        }
     }
 
     private fun setupCarousel(expSetCarousel: Carousel, sets: List<TcgSetInterface>) {
