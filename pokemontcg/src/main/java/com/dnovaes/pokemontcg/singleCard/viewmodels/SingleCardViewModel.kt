@@ -11,6 +11,7 @@ import com.dnovaes.commons.data.model.uiviewstate.inDone
 import com.dnovaes.commons.data.model.uiviewstate.inProcess
 import com.dnovaes.commons.data.model.uiviewstate.withError
 import com.dnovaes.commons.data.model.uiviewstate.withResult
+import com.dnovaes.pokemontcg.R
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
@@ -47,16 +48,26 @@ class SingleCardViewModel @Inject constructor(
         val currSetState = _setsLiveData.value ?: return
 
         val sets = currSetState.result
-        val selectedExpansionSet = sets?.selectedId ?: sets?.collection?.last()?.id ?: ""
-        val cardSetId = "$selectedExpansionSet-${cardNumber}"
-
+        val selectedExpansionSet = sets?.selectedId ?: sets?.collection?.firstOrNull()?.id ?: run {
+            postUnselectedSetError()
+            return
+        }
         _cardLiveData.postValue(initialCardState)
-
         viewModelScope.launch {
+            val cardSetId = "$selectedExpansionSet-${cardNumber}"
             singleCardUseCase.requestCard(cardSetId).collect { result ->
                 handleSingleCardResponse(result)
             }
         }
+    }
+
+    private fun postUnselectedSetError() {
+        val newState = initialCardState
+            .inDone()
+            .asLoadingPkmSingleCard()
+            .withResult(null)
+            .withError(UIError(R.string.search_failure_set_not_selected))
+        _cardLiveData.postValue(newState)
     }
 
     private fun handleSingleCardResponse(

@@ -4,7 +4,7 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-fun BottomSheetDialog.makesNotDraggable() {
+fun BottomSheetDialog.setNotDraggable() {
     val behavior = this.behavior
     behavior.addBottomSheetCallback(object :
         BottomSheetBehavior.BottomSheetCallback() {

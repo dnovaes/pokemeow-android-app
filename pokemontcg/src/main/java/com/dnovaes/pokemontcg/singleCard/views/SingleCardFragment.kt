@@ -10,7 +10,7 @@ import androidx.constraintlayout.helper.widget.Carousel
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.data.model.uiviewstate.UIDataState
-import com.dnovaes.commons.utilities.extensions.makesNotDraggable
+import com.dnovaes.commons.utilities.extensions.setNotDraggable
 import com.dnovaes.commons.utilities.extensions.onDone
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
@@ -18,7 +18,6 @@ import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.model.hasDoneLoadingPkmSets
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -107,7 +106,7 @@ class SingleCardFragment : BaseFragment() {
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
         val cardNumberInputLayout = bottomSheet.findViewById<TextInputLayout>(R.id.input_layout_card_number)!!
 
-        bottomSheet.makesNotDraggable()
+        bottomSheet.setNotDraggable()
 
         val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
         setupCarousel(setsCarousel, tcgSets)
@@ -132,7 +131,6 @@ class SingleCardFragment : BaseFragment() {
             override fun populate(view: View?, index: Int) {
                 val imgView = view as ImageView
                 val currSet = sets.collection[index]
-                //println("logd populating $index with set: ${currSet.id}, ${currSet.name}, with view: ${view.hashCode()}")
                 Glide.with(context)
                     .load(currSet.images.logo)
                     .into(imgView)

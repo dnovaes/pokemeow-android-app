@@ -10,7 +10,7 @@ data class UIViewState<T: UIModelInterface>(
     val error: UIError? = null
 )
 
-fun <T: UIModelInterface> UIViewState<T>.withResult(result: T): UIViewState<T> {
+fun <T: UIModelInterface> UIViewState<T>.withResult(result: T?): UIViewState<T> {
     return this.copy(result = result, error = error)
 }
 
