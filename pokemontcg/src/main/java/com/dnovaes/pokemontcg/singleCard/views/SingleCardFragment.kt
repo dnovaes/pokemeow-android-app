@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ImageView
 import androidx.constraintlayout.helper.widget.Carousel
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -14,7 +13,9 @@ import com.dnovaes.commons.utilities.extensions.setNotDraggable
 import com.dnovaes.commons.utilities.extensions.onDone
 import com.dnovaes.commons.views.BaseFragment
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
+import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
+import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardSetsInterface
+import com.dnovaes.pokemontcg.commonFeature.views.TCGCarouselAdapter
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.model.hasDoneLoadingPkmSets
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
@@ -100,7 +101,7 @@ class SingleCardFragment : BaseFragment() {
         }
     }
 
-    private fun showBottomSheet(tcgSets: TcgSetsInterface) {
+    private fun showBottomSheet(tcgSets: SingleCardSetsInterface) {
         val bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.bottomsheet_select_expansion_and_card_layout)
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
@@ -109,7 +110,7 @@ class SingleCardFragment : BaseFragment() {
         bottomSheet.setNotDraggable()
 
         val setsCarousel = bottomSheet.findViewById<Carousel>(R.id.bsheet_expset_carousel)!!
-        setupCarousel(setsCarousel, tcgSets)
+        setupCarousel(setsCarousel, tcgSets.collection)
 
         cardNumberEditText.onDone {
             processBottomSheetCardNumber(cardNumberEditText)
@@ -123,23 +124,21 @@ class SingleCardFragment : BaseFragment() {
         bottomSheet.show()
     }
 
-    private fun setupCarousel(expSetCarousel: Carousel, sets: TcgSetsInterface) {
+    private fun setupCarousel(expSetCarousel: Carousel, sets: List<TcgSetInterface>) {
         val context = this
-        expSetCarousel.setAdapter(object: Carousel.Adapter {
-            override fun count() = sets.collection.size
-
-            override fun populate(view: View?, index: Int) {
-                val imgView = view as ImageView
-                val currSet = sets.collection[index]
+        val adapter = TCGCarouselAdapter(
+            sets.size,
+            onPopulateImage = { index, imgView ->
+                val currSet = sets[index]
                 Glide.with(context)
                     .load(currSet.images.logo)
                     .into(imgView)
-            }
-
-            override fun onNewItem(index: Int) {
+            },
+            onDragOption = { index ->
                 viewModel.selectSet(index)
             }
-        })
+        )
+        expSetCarousel.setAdapter(adapter)
     }
 
     private fun processBottomSheetCardNumber(editText: EditText) {

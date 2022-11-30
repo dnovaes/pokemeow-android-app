@@ -8,13 +8,12 @@ import com.dnovaes.commons.data.model.UIError
 import com.dnovaes.commons.data.model.uiviewstate.UIDataState
 import com.dnovaes.commons.data.model.uiviewstate.UIViewState
 import com.dnovaes.commons.data.model.uiviewstate.inDone
-import com.dnovaes.commons.data.model.uiviewstate.inProcess
 import com.dnovaes.commons.data.model.uiviewstate.withError
 import com.dnovaes.commons.data.model.uiviewstate.withResult
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.commonFeature.domain.TcgSets
+import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardTCGSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
-import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetsInterface
+import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardSetsInterface
 import com.dnovaes.pokemontcg.singleCard.data.model.SingleCardUIDataProcess
 import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmCardSets
 import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmSingleCard
@@ -37,9 +36,9 @@ class SingleCardViewModel @Inject constructor(
         state = UIDataState.PROCESSING
     )
 
-    private val _setsLiveData: MutableLiveData<UIViewState<TcgSetsInterface>> = MutableLiveData()
-    val setsLiveData: LiveData<UIViewState<TcgSetsInterface>> = _setsLiveData
-    private val initialSetsState = UIViewState<TcgSetsInterface>(
+    private val _setsLiveData: MutableLiveData<UIViewState<SingleCardSetsInterface>> = MutableLiveData()
+    val setsLiveData: LiveData<UIViewState<SingleCardSetsInterface>> = _setsLiveData
+    private val initialSetsState = UIViewState<SingleCardSetsInterface>(
         process = SingleCardUIDataProcess.LOADING_CARD_SETS,
         state = UIDataState.PROCESSING
     )
@@ -112,7 +111,7 @@ class SingleCardViewModel @Inject constructor(
         }
     }
 
-    private fun postCachedSets(uiData: UIViewState<TcgSetsInterface>) {
+    private fun postCachedSets(uiData: UIViewState<SingleCardSetsInterface>) {
         val newState = uiData
             .asLoadingPkmCardSets()
             .inDone()
@@ -126,7 +125,7 @@ class SingleCardViewModel @Inject constructor(
             content?.let {
                 val newState = initialSetsState
                     .inDone()
-                    .withResult(TcgSets(null, it))
+                    .withResult(SingleCardTCGSets(null, it))
                     .withError(null)
                 _setsLiveData.postValue(newState)
             }
@@ -152,7 +151,7 @@ class SingleCardViewModel @Inject constructor(
             .inDone()
             .asPickingPkmCardSet()
             .withResult(
-                TcgSets(
+                SingleCardTCGSets(
                     selectedId = selectedSet.id,
                     setsCollection.collection
                 )
