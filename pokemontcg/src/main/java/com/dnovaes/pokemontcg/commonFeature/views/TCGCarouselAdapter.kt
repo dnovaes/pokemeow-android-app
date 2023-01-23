@@ -7,7 +7,7 @@ import androidx.constraintlayout.helper.widget.Carousel
 class TCGCarouselAdapter(
     private val count: Int,
     private val onPopulateImage: (Int, ImageView) -> Unit,
-    private val onDragOption: (Int)-> Unit
+    private val onSlideOption: (Int)-> Unit
 ): Carousel.Adapter {
     override fun count() = count
 
@@ -16,6 +16,6 @@ class TCGCarouselAdapter(
     }
 
     override fun onNewItem(index: Int) {
-        onDragOption(index)
+        onSlideOption(index)
     }
 }

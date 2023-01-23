@@ -22,6 +22,7 @@ import com.dnovaes.pokemontcg.singleCard.domain.model.ui.CardInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -47,7 +48,7 @@ class SingleCardViewModel @Inject constructor(
         val currSetState = _setsLiveData.value ?: return
 
         val sets = currSetState.result
-        val selectedExpansionSet = sets?.selectedId ?: sets?.collection?.firstOrNull()?.id ?: run {
+        val selectedExpansionSet = sets?.selectedIdName ?: sets?.collection?.firstOrNull()?.idName ?: run {
             postUnselectedSetError()
             return
         }
@@ -98,8 +99,24 @@ class SingleCardViewModel @Inject constructor(
     }
 
     fun getExpansionSets() {
-        _setsLiveData.value?.let {
-            postCachedSets(it)
+        _setsLiveData.value?.let { uiState ->
+            val selectedIdName = uiState.result?.selectedIdName ?: return
+            val singleCardCollection = uiState.result?.collection ?: return
+            if (singleCardCollection.first().idName != selectedIdName) {
+                val index = singleCardCollection.indexOfFirst{ it.idName == selectedIdName }
+                val collectionPrev = singleCardCollection.subList(0, index)
+                val collectionNext = singleCardCollection.subList(index, singleCardCollection.size)
+                val orderedCollectionBySelected = mutableListOf<TcgSetInterface>()
+                orderedCollectionBySelected.addAll(collectionNext.plus(collectionPrev))
+                val newUIState= uiState.copy()
+                    .withResult(SingleCardTCGSets(
+                        selectedIdName = selectedIdName,
+                        collection = orderedCollectionBySelected
+                    ))
+                postCachedSets(newUIState)
+            } else {
+                postCachedSets(uiState)
+            }
         } ?: run {
             _setsLiveData.postValue(initialSetsState)
 
@@ -123,9 +140,14 @@ class SingleCardViewModel @Inject constructor(
         if (response.isSuccess) {
             val content = response.getOrNull()
             content?.let {
+                val initialSelectedSet = it.firstOrNull()?.idName
                 val newState = initialSetsState
+                    .asLoadingPkmCardSets()
                     .inDone()
-                    .withResult(SingleCardTCGSets(null, it))
+                    .withResult(SingleCardTCGSets(
+                        selectedIdName = initialSelectedSet,
+                        collection = it
+                    ))
                     .withError(null)
                 _setsLiveData.postValue(newState)
             }
@@ -134,6 +156,7 @@ class SingleCardViewModel @Inject constructor(
                 //TODO
                 //val exception = mapException(throwable)
                 //logger.info(throwable)
+                println("logd Error: ${throwable.message}")
                 val uiError = UIError(throwable = throwable)
                 val newState = initialSetsState
                     .inDone()
@@ -145,19 +168,22 @@ class SingleCardViewModel @Inject constructor(
 
     fun selectSet(index: Int) {
         val currState = _setsLiveData.value ?: return
-        val setsCollection = currState.result ?: return
-        val selectedSet = setsCollection.collection[index]
-        val newState = currState
-            .inDone()
-            .asPickingPkmCardSet()
-            .withResult(
-                SingleCardTCGSets(
-                    selectedId = selectedSet.id,
-                    setsCollection.collection
+        val currSingleCardSets = currState.result ?: return
+        val selectedSet = currSingleCardSets.collection[index]
+        println("logd selectedSet idName: ${selectedSet.idName} of index: $index")
+        viewModelScope.launch(Dispatchers.Default) {
+            val newState = currState
+                .inDone()
+                .asPickingPkmCardSet()
+                .withResult(
+                    SingleCardTCGSets(
+                        selectedIdName = selectedSet.idName,
+                        currSingleCardSets.collection
+                    )
                 )
-            )
-            .withError(null)
-        _setsLiveData.postValue(newState)
+                .withError(null)
+            _setsLiveData.postValue(newState)
+        }
     }
 
 }

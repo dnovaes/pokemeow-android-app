@@ -3,15 +3,15 @@ package com.dnovaes.pokemontcg.commonFeature.domain
 import com.dnovaes.commons.data.model.UIModelInterface
 
 interface TcgSetInterface: UIModelInterface {
-    val id: String
-    val name: String
+    val idName: String
+    val title: String
     val images: TcgSetImagesInterface
 }
 
 class TcgSet(
-    override val id: String,
-    override val name: String,
+    override val idName: String,
+    override val title: String,
     override val images: TcgSetImages
 ): TcgSetInterface {
-    override fun toString(): String = "{$id, $name}"
+    override fun toString(): String = "{$idName, $title}"
 }

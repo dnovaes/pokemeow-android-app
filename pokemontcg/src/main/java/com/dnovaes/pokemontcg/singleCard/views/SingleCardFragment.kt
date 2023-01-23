@@ -72,7 +72,7 @@ class SingleCardFragment : BaseFragment() {
             when {
                 uiData.hasDoneLoadingPkmSets() -> {
                     uiData.result?.let {
-                        showBottomSheet(it)
+                        showBottomSheet(it, it.selectedIdName)
                     }
                     stopLoading()
                 }
@@ -101,7 +101,7 @@ class SingleCardFragment : BaseFragment() {
         }
     }
 
-    private fun showBottomSheet(tcgSets: SingleCardSetsInterface) {
+    private fun showBottomSheet(tcgSets: SingleCardSetsInterface, selectedSetId: String?) {
         val bottomSheet = buildSetsBottomSheet(tcgSets)
 
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!
@@ -137,7 +137,8 @@ class SingleCardFragment : BaseFragment() {
                     .load(currSet.images.logo)
                     .into(imgView)
             },
-            onDragOption = { index ->
+            onSlideOption = { index ->
+                println("logd slided to index: $index")
                 viewModel.selectSet(index)
             }
         )
