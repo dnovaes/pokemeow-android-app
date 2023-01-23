@@ -14,15 +14,11 @@ class LoggerInterceptor: PokeLoggerInterceptorInterface {
 
         println("logd ==== REQUEST ====")
         println("logd request: $request")
-        println("logd body: ${request.body}")
-        println("logd headers: ${request.headers}")
         println("logd ==== request end ====")
 
         val response = chain.proceed(request)
         println("logd ==== RESPONSE ====")
         println("logd response: $response")
-        println("logd body: ${response.body}")
-        println("logd headers: ${response.headers}")
         println("logd ==== response end ====")
         return response
     }
