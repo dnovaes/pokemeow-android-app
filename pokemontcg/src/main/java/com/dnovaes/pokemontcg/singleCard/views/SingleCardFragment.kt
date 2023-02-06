@@ -89,6 +89,7 @@ class SingleCardFragment : BaseFragment() {
                     it.result?.let { card ->
                         Glide.with(this)
                             .load(card.images.small)
+                            .placeholder(R.drawable.pkm_card_back)
                             .centerCrop()
                             .into(binding.imgSingleCard)
                     }

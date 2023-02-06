@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/left"
+        motion:constraintSetStart="@id/start"
+        motion:duration="2000">
+       <KeyFrameSet>
+       </KeyFrameSet>
+        <OnSwipe
+            motion:dragDirection="dragLeft"
+            motion:touchAnchorSide="left" />
+    </Transition>
+
+    <Transition
+        motion:constraintSetEnd="@+id/right"
+        motion:constraintSetStart="@id/start"
+        motion:duration="2000">
+        <KeyFrameSet>
+        </KeyFrameSet>
+        <OnSwipe
+            motion:dragDirection="dragRight"
+            motion:touchAnchorSide="right" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/right">
+        <Constraint
+            android:id="@+id/img_single_card"
+            android:layout_width="@dimen/dimen_single_card_swipe_out_width"
+            android:layout_height="@dimen/dimen_single_card_swipe_out_height"
+            motion:layout_constraintBottom_toTopOf="@id/btn_single_card"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintLeft_toRightOf="parent"
+            android:visibility="invisible" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/left">
+        <Constraint
+            android:id="@+id/img_single_card"
+            android:layout_width="@dimen/dimen_single_card_swipe_out_width"
+            android:layout_height="@dimen/dimen_single_card_swipe_out_height"
+            motion:layout_constraintBottom_toTopOf="@id/btn_single_card"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintRight_toLeftOf="parent"
+            android:visibility="invisible" />
+    </ConstraintSet>
+</MotionScene>
