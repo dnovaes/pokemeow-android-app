@@ -1,11 +1,14 @@
 package com.dnovaes.pokemontcg.singleCard.views
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.annotation.IdRes
 import androidx.constraintlayout.helper.widget.Carousel
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dnovaes.commons.data.model.uiviewstate.UIDataState
@@ -65,6 +68,7 @@ class SingleCardFragment : BaseFragment() {
     private fun setObservers() {
         observeExpansionSetsData()
         observeSingleCardLoad()
+        setupViewListeners()
     }
 
     private fun observeExpansionSetsData() {
@@ -99,6 +103,50 @@ class SingleCardFragment : BaseFragment() {
                 }
                 UIDataState.PROCESSING -> showLoading()
             }
+        }
+    }
+
+    private val singleCardTransitionListener: MotionLayout.TransitionListener = object : MotionLayout.TransitionListener {
+        override fun onTransitionStarted(
+            motionLayout: MotionLayout?,
+            startId: Int,
+            endId: Int
+        ) {
+            //do nothing
+        }
+
+        override fun onTransitionChange(
+            motionLayout: MotionLayout?,
+            startId: Int,
+            endId: Int,
+            progress: Float
+        ) {
+            //do nothing
+        }
+
+        override fun onTransitionCompleted(motionLayout: MotionLayout?, currentConstraintId: Int) {
+            handleSingleCardTransition(currentConstraintId)
+        }
+
+        override fun onTransitionTrigger(
+            motionLayout: MotionLayout?,
+            triggerId: Int,
+            positive: Boolean,
+            progress: Float
+        ) {
+            //do nothing
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupViewListeners() {
+        binding.motionLayoutSingleCard.addTransitionListener(singleCardTransitionListener)
+    }
+
+    private fun handleSingleCardTransition(@IdRes currentConstraintId: Int) {
+        when (currentConstraintId) {
+            R.id.single_card_left -> viewModel.loadNextCardInCurrCollection()
+            R.id.single_card_right -> viewModel.loadPrevCardInCurrCollection()
         }
     }
 

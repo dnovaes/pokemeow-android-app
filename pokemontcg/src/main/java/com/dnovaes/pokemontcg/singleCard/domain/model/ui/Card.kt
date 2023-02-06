@@ -8,6 +8,7 @@ interface CardInterface: UIModelInterface {
     val name: String
     val hp: String?
     val images: CardImagesInterface
+    val lastCardNumberSearched: String
 }
 
 @Serializable
@@ -15,5 +16,6 @@ data class Card(
     override val id: String,
     override val name: String,
     override val hp: String? = null,
-    override val images: CardImages
+    override val images: CardImages,
+    override val lastCardNumberSearched: String = ""
 ) : CardInterface
