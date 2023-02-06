@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="launcher_fragment_label">Pokemon TCG App</string>
-    <string name="single_card_fragment_label">Search for your Card</string>
+    <string name="single_card_fragment_label">Search your Card</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
