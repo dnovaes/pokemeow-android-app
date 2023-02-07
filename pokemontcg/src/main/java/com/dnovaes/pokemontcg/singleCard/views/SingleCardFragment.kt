@@ -20,7 +20,9 @@ import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardSetsInterface
 import com.dnovaes.pokemontcg.commonFeature.views.TCGCarouselAdapter
 import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
-import com.dnovaes.pokemontcg.singleCard.data.model.hasDoneLoadingPkmSets
+import com.dnovaes.pokemontcg.singleCard.data.model.isDoneLoadingPkmCardSets
+import com.dnovaes.pokemontcg.singleCard.data.model.isDoneLoadingSingleCard
+import com.dnovaes.pokemontcg.singleCard.data.model.isProcessingLoadingSingleCard
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -72,36 +74,42 @@ class SingleCardFragment : BaseFragment() {
     }
 
     private fun observeExpansionSetsData() {
-        viewModel.setsLiveData.observe(viewLifecycleOwner) { uiData ->
+        viewModel.setsLiveData.observe(viewLifecycleOwner) {
             when {
-                uiData.hasDoneLoadingPkmSets() -> {
-                    uiData.result?.let {
-                        showBottomSheet(it, it.selectedIdName)
+                it.isDoneLoadingPkmCardSets() -> {
+                    it.result?.let { cardSets ->
+                        showBottomSheet(cardSets)
                     }
                     stopLoading()
                 }
-                uiData.state == UIDataState.PROCESSING -> showLoading()
+                it.state == UIDataState.PROCESSING -> showLoading()
             }
         }
     }
 
     private fun observeSingleCardLoad() {
         viewModel.cardLiveData.observe(viewLifecycleOwner) {
-            when (it.state) {
-                UIDataState.DONE -> {
+            when {
+                it.isDoneLoadingSingleCard() -> {
                     stopLoading()
                     it.result?.let { card ->
                         Glide.with(this)
                             .load(card.images.small)
                             .placeholder(R.drawable.pkm_card_back)
                             .centerCrop()
-                            .into(binding.imgSingleCard)
+                            .into(binding.imgSingleCardCenter)
                     }
                     it.error?.let { error ->
                         Snackbar.make(binding.root, getString(error.stringRes), Snackbar.LENGTH_LONG).show()
                     }
                 }
-                UIDataState.PROCESSING -> showLoading()
+                it.isProcessingLoadingSingleCard() -> {
+                    showLoading()
+                    Glide.with(this)
+                        .load(R.drawable.pkm_card_back)
+                        .centerCrop()
+                        .into(binding.imgSingleCardCenter)
+                }
             }
         }
     }
@@ -150,7 +158,7 @@ class SingleCardFragment : BaseFragment() {
         }
     }
 
-    private fun showBottomSheet(tcgSets: SingleCardSetsInterface, selectedSetId: String?) {
+    private fun showBottomSheet(tcgSets: SingleCardSetsInterface) {
         val bottomSheet = buildSetsBottomSheet(tcgSets)
 
         val cardNumberEditText = bottomSheet.findViewById<TextInputEditText>(R.id.edit_text_card_number)!!

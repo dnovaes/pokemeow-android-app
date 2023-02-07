@@ -7,22 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.dnovaes.commons.data.model.UIError
 import com.dnovaes.commons.data.model.uiviewstate.UIDataState
 import com.dnovaes.commons.data.model.uiviewstate.UIViewState
-import com.dnovaes.commons.data.model.uiviewstate.inDone
-import com.dnovaes.commons.data.model.uiviewstate.inProcessing
-import com.dnovaes.commons.data.model.uiviewstate.withError
-import com.dnovaes.commons.data.model.uiviewstate.withResult
 import com.dnovaes.pokemontcg.R
-import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardTCGSets
 import com.dnovaes.pokemontcg.commonFeature.domain.TcgSetInterface
+import com.dnovaes.pokemontcg.singleCard.domain.model.ui.SingleCardTCGSets
 import com.dnovaes.pokemontcg.singleCard.data.model.SingleCardUIDataProcess
-import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmCardSets
-import com.dnovaes.pokemontcg.singleCard.data.model.asLoadingPkmSingleCard
-import com.dnovaes.pokemontcg.singleCard.data.model.asPickingPkmCardSet
+import com.dnovaes.pokemontcg.singleCard.data.model.asDoneLoadingPkmSingleCard
+import com.dnovaes.pokemontcg.singleCard.data.model.asDoneLoadingPkmCardSet
+import com.dnovaes.pokemontcg.singleCard.data.model.asDoneSelectingPkmCardSet
+import com.dnovaes.pokemontcg.singleCard.data.model.asProcessingLoadingPkmSingleCard
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.Card
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -52,10 +50,9 @@ class SingleCardViewModel @Inject constructor(
             return
         }
         currCardState = currCardState
+            .asProcessingLoadingPkmSingleCard()
             .withResult(currCardState.result?.copy(lastCardNumberSearched = cardNumber))
             .withError(null)
-            .asLoadingPkmSingleCard()
-            .inProcessing()
         _cardLiveData.postValue(currCardState)
         viewModelScope.launch {
             val cardSetId = "$selectedExpansionSet-${cardNumber}"
@@ -67,8 +64,7 @@ class SingleCardViewModel @Inject constructor(
 
     private fun postUnselectedSetError() {
         currCardState = currCardState
-            .inDone()
-            .asLoadingPkmSingleCard()
+            .asDoneLoadingPkmSingleCard()
             .withResult(null)
             .withError(UIError(R.string.search_failure_set_not_selected))
         _cardLiveData.postValue(currCardState)
@@ -82,8 +78,7 @@ class SingleCardViewModel @Inject constructor(
             val content = result.getOrNull()
             content?.let {
                 currCardState = currCardState
-                    .inDone()
-                    .asLoadingPkmSingleCard()
+                    .asDoneLoadingPkmSingleCard()
                     .withResult(it.copy(lastCardNumberSearched = cardNumberSearched))
                     .withError(null)
                 _cardLiveData.postValue(currCardState)
@@ -95,8 +90,7 @@ class SingleCardViewModel @Inject constructor(
                 //logger.info(throwable)
                 val uiError = UIError(throwable = throwable)
                 currCardState = currCardState
-                    .inDone()
-                    .asLoadingPkmSingleCard()
+                    .asDoneLoadingPkmSingleCard()
                     .withError(uiError)
                 _cardLiveData.postValue(currCardState)
             }
@@ -104,24 +98,23 @@ class SingleCardViewModel @Inject constructor(
     }
 
     fun getExpansionSets() {
-        _setsLiveData.value?.let { uiState ->
-            val selectedIdName = uiState.result?.selectedIdName ?: return
-            val singleCardCollection = uiState.result?.collection ?: return
+        currCardSetsState.result?.let { uiState ->
+            val selectedIdName = uiState.selectedIdName ?: return
+            val singleCardCollection = uiState.collection
             if (singleCardCollection.first().idName != selectedIdName) {
                 val index = singleCardCollection.indexOfFirst{ it.idName == selectedIdName }
                 val collectionPrev = singleCardCollection.subList(0, index)
                 val collectionNext = singleCardCollection.subList(index, singleCardCollection.size)
                 val orderedCollectionBySelected = mutableListOf<TcgSetInterface>()
                 orderedCollectionBySelected.addAll(collectionNext.plus(collectionPrev))
-                currCardSetsState = uiState.copy()
+                currCardSetsState = currCardSetsState
+                    .asDoneLoadingPkmCardSet()
                     .withResult(SingleCardTCGSets(
                         selectedIdName = selectedIdName,
                         collection = orderedCollectionBySelected
                     ))
-                postCachedSets(currCardSetsState)
-            } else {
-                postCachedSets(uiState)
             }
+            postCachedSets(currCardSetsState)
         } ?: run {
             _setsLiveData.postValue(currCardSetsState)
 
@@ -135,8 +128,7 @@ class SingleCardViewModel @Inject constructor(
 
     private fun postCachedSets(uiData: UIViewState<SingleCardTCGSets>) {
         currCardSetsState = uiData
-            .asLoadingPkmCardSets()
-            .inDone()
+            .asDoneLoadingPkmCardSet()
             .withError(null)
         _setsLiveData.postValue(currCardSetsState)
     }
@@ -147,8 +139,7 @@ class SingleCardViewModel @Inject constructor(
             content?.let {
                 val initialSelectedSet = it.firstOrNull()?.idName
                 currCardSetsState = currCardSetsState
-                    .asLoadingPkmCardSets()
-                    .inDone()
+                    .asDoneLoadingPkmCardSet()
                     .withResult(SingleCardTCGSets(
                         selectedIdName = initialSelectedSet,
                         collection = it
@@ -164,7 +155,7 @@ class SingleCardViewModel @Inject constructor(
                 println("logd Error: ${throwable.message}")
                 val uiError = UIError(throwable = throwable)
                 currCardSetsState = currCardSetsState
-                    .inDone()
+                    .asDoneLoadingPkmCardSet()
                     .withError(uiError)
                 _setsLiveData.postValue(currCardSetsState)
             }
@@ -177,8 +168,7 @@ class SingleCardViewModel @Inject constructor(
         println("logd selectedSet idName: ${selectedSet.idName} of index: $index")
         viewModelScope.launch(Dispatchers.Default) {
             currCardSetsState = currCardSetsState
-                .inDone()
-                .asPickingPkmCardSet()
+                .asDoneSelectingPkmCardSet()
                 .withResult(
                     currSingleCardSets.copy(
                         selectedIdName = selectedSet.idName,
@@ -200,8 +190,8 @@ class SingleCardViewModel @Inject constructor(
     fun loadNextCardInCurrCollection() {
         val lastCardNumber = currCardState.result?.lastCardNumberSearched ?: return
         if (lastCardNumber.isBlank()) return
-        val nextCard = lastCardNumber.toInt(10) + 1
-        getCard(nextCard.toString())
+        val nextCardNumber = lastCardNumber.toInt(10) + 1
+        getCard(nextCardNumber.toString())
     }
 
 

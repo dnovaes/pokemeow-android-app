@@ -11,14 +11,34 @@
     tools:context=".singleCard.views.SingleCardFragment">
 
     <ImageView
-        android:id="@+id/img_single_card"
+        android:id="@+id/img_single_card_prev"
+        android:layout_width="@dimen/dimen_single_card_swipe_out_width"
+        android:layout_height="@dimen/dimen_single_card_swipe_out_height"
+        android:src="@drawable/pkm_card_back"
+        android:layout_marginHorizontal="@dimen/margin_horizontal_single_card_img"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/img_single_card_center"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_single_card_center"
         android:layout_width="@dimen/dimen_single_card_width"
         android:layout_height="@dimen/dimen_single_card_height"
         android:src="@drawable/pkm_card_back"
-        android:layout_marginVertical="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_single_card_next"
+        android:layout_width="@dimen/dimen_single_card_swipe_out_width"
+        android:layout_height="@dimen/dimen_single_card_swipe_out_height"
+        android:src="@drawable/pkm_card_back"
+        android:layout_marginHorizontal="@dimen/margin_horizontal_single_card_img"
+        android:alpha="0.9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/img_single_card_center"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button

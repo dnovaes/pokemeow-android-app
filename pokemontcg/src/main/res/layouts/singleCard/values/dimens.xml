@@ -5,4 +5,5 @@
     <dimen name="dimen_single_card_height">476dp</dimen>
     <dimen name="dimen_single_card_swipe_out_width">200dp</dimen>
     <dimen name="dimen_single_card_swipe_out_height">400dp</dimen>
+    <dimen name="margin_horizontal_single_card_img">20dp</dimen>
 </resources>
