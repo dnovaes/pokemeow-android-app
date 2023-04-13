@@ -13,6 +13,7 @@ import com.dnovaes.pokemontcg.databinding.FragmentSingleCardBinding
 import com.dnovaes.pokemontcg.singleCard.data.remote.network.PokemonTcgAPIInterface
 import com.dnovaes.pokemontcg.commonFeature.repository.PokemonTcgRepository
 import com.dnovaes.pokemontcg.commonFeature.repository.mapper.TcgMapper
+import com.dnovaes.pokemontcg.singleCard.domain.monitoring.SingleCardMonitoring
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCase
 import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapper
 import com.dnovaes.pokemontcg.singleCard.viewmodels.SingleCardViewModel
@@ -56,8 +57,9 @@ class SingleCardFragmentWithoutDI : BaseFragment() {
         val singleCardMapper = SingleCardMapper()
         val mapper = TcgMapper()
         val singleCardUseCase = SingleCardUseCase(tcgRepository, singleCardMapper, mapper)
+        val monitoring = SingleCardMonitoring()
         createWithFactory {
-            SingleCardViewModel(singleCardUseCase)
+            SingleCardViewModel(monitoring, singleCardUseCase)
         }
     }
 

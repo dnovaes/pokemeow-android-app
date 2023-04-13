@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
     id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
+    id 'newrelic'
 }
 
 Properties properties = new Properties()
@@ -19,6 +20,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "String", "POKETCG_API_KEY", "${properties.getProperty('POKETCG_API_KEY')}"
+        buildConfigField "String", "NEWRELIC_KEY", "${properties.getProperty('NEWRELIC_KEY')}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -72,4 +74,6 @@ dependencies {
 
     implementation project(':commons')
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0-RC"
+
+    implementation 'com.newrelic.agent.android:android-agent:6.10.0'
 }

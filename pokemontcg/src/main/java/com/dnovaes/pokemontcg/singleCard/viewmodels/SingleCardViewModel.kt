@@ -16,15 +16,16 @@ import com.dnovaes.pokemontcg.singleCard.data.model.asDoneLoadingPkmCardSet
 import com.dnovaes.pokemontcg.singleCard.data.model.asDoneSelectingPkmCardSet
 import com.dnovaes.pokemontcg.singleCard.data.model.asProcessingLoadingPkmSingleCard
 import com.dnovaes.pokemontcg.singleCard.domain.model.ui.Card
+import com.dnovaes.pokemontcg.singleCard.domain.monitoring.SingleCardMonitoring
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SingleCardViewModel @Inject constructor(
+    private val monitoring: SingleCardMonitoring,
     private val singleCardUseCase: SingleCardUseCaseInterface,
 ): ViewModel() {
 
@@ -57,7 +58,7 @@ class SingleCardViewModel @Inject constructor(
         viewModelScope.launch {
             val cardSetId = "$selectedExpansionSet-${cardNumber}"
             singleCardUseCase.requestCard(cardSetId).collect { result ->
-                handleSingleCardResponse(result as Result<Card>, cardNumber)
+                handleSingleCardResponse(result as Result<Card>, selectedExpansionSet, cardNumber)
             }
         }
     }
@@ -72,10 +73,14 @@ class SingleCardViewModel @Inject constructor(
 
     private fun handleSingleCardResponse(
         result: Result<Card>,
+        selectedExpansionIdName: String,
         cardNumberSearched: String
     ) {
+        val logParams = mapOf("cardNumber" to cardNumberSearched, "expansionId" to selectedExpansionIdName)
+        val action = "getCard"
         if (result.isSuccess) {
             val content = result.getOrNull()
+            monitoring.logCardSuccessResponse(action, logParams)
             content?.let {
                 currCardState = currCardState
                     .asDoneLoadingPkmSingleCard()
@@ -84,6 +89,7 @@ class SingleCardViewModel @Inject constructor(
                 _cardLiveData.postValue(currCardState)
             }
         } else {
+            monitoring.logCardFailureResponse(action, logParams, result.exceptionOrNull())
             result.exceptionOrNull()?.let { throwable ->
                 //TODO
                 //val exception = mapException(throwable)

@@ -1,7 +1,9 @@
 package com.dnovaes.pokemontcg.singleCard.domain.di
 
+import com.dnovaes.pokemontcg.commonFeature.domain.monitoring.AnalyticsConfiguration
 import com.dnovaes.pokemontcg.commonFeature.repository.TcgRepositoryInterface
 import com.dnovaes.pokemontcg.commonFeature.repository.mapper.TcgMapperInterface
+import com.dnovaes.pokemontcg.singleCard.domain.monitoring.SingleCardMonitoring
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCase
 import com.dnovaes.pokemontcg.singleCard.domain.repository.SingleCardUseCaseInterface
 import com.dnovaes.pokemontcg.singleCard.domain.repository.mapper.SingleCardMapper
@@ -28,4 +30,9 @@ class SingleCardModule {
         singleCardMapper,
         tcgMapper
     )
+
+    @Provides
+    fun providesSingleCardMonitoring(
+        analyticsConfig: AnalyticsConfiguration
+    ): SingleCardMonitoring = SingleCardMonitoring()
 }
